@@ -21,11 +21,15 @@ public class IceCreamMachine : MonoBehaviour
 
     private Flavor currentFlavour;
 
+    private ObjectPool<MeshRenderer> pool;
+
 
     private void Start()
     {
         initialHeight = gameObject.transform.position.y;
         splineContainer = iceCreamCone.GetSplineContainer();
+
+        pool = new ObjectPool<MeshRenderer>(iceCreamPiecePrefab.GetComponent<MeshRenderer>(), iceCreamCone.GetCreamStorage() ,500);
     }
 
     private void FixedUpdate()
@@ -35,19 +39,27 @@ public class IceCreamMachine : MonoBehaviour
             elapcedTime += Time.fixedDeltaTime * pouringSpeed;
             position = splineContainer.EvaluatePosition(elapcedTime);
 
-            SetNewIceCreamPiece();
+            float y = position.y;
 
             position.y = initialHeight;
             transform.position = position;
+
+            position.y = y;
+
+            SetNewIceCreamPiece();
         }
     }
 
     private void SetNewIceCreamPiece()
     {
-        GameObject newCreamPiece = Instantiate(iceCreamPiecePrefab, creamOutlet.position, Quaternion.identity, iceCreamCone.GetCreamStorage());
-        newCreamPiece.GetComponent<MeshRenderer>().material.color = currentFlavour.flavorColor;
-
-        newCreamPiece.transform.DOMove(position, 1f);
+        MeshRenderer newPiece = pool.GetObjectFromPool();
+        newPiece.transform.position = creamOutlet.position;
+        //newPiece.gameObject.transform.SetParent(iceCreamCone.GetCreamStorage());
+        //GameObject newCreamPiece = Instantiate(iceCreamPiecePrefab, creamOutlet.position, Quaternion.identity, iceCreamCone.GetCreamStorage());
+        //newCreamPiece.GetComponent<MeshRenderer>().material.color = currentFlavour.flavorColor;
+        newPiece.material.color = currentFlavour.flavorColor;
+        //newCreamPiece.transform.DOMove(position, 1f);
+        newPiece.transform.DOMove(position, 1f);
     }
 
     public void ChangeFlavor(FlavorType flavorType)
