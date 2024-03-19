@@ -29,7 +29,7 @@ public class IceCreamMachine : MonoBehaviour
         initialHeight = gameObject.transform.position.y;
         splineContainer = iceCreamCone.GetSplineContainer();
 
-        pool = new ObjectPool<MeshRenderer>(iceCreamPiecePrefab.GetComponent<MeshRenderer>(), iceCreamCone.GetCreamStorage() ,500);
+        pool = new ObjectPool<MeshRenderer>(iceCreamPiecePrefab.GetComponent<MeshRenderer>(), iceCreamCone.GetCreamStorage() ,1200);
     }
 
     private void FixedUpdate()

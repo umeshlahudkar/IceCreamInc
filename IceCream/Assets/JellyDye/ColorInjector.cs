@@ -1,56 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ColorInjector : MonoBehaviour
 {
-    public Color injectionColor = Color.red;
-    public float transitionDuration = 1f;
-    public float raycastDistance = 100f;
+    public float maxRadius = 1f; 
+    public float maxRadiusIncrement = 0.1f; 
+    public float maxMaxRadius = 5f; 
+    public float colorChangeSpeed = 1f;
+    public Color targetColor = Color.red;
 
-    private bool isInjectingColor = false;
+    private bool isMouseDown = false;
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !isInjectingColor)
+        if (Input.GetMouseButtonDown(0))
         {
-            StartCoroutine(ChangeMeshColorSmoothly());
+            isMouseDown = true;
         }
-    }
 
-    IEnumerator ChangeMeshColorSmoothly()
-    {
-        isInjectingColor = true;
-
-        // Cast a ray from the mouse position into the scene
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, raycastDistance))
+        if (Input.GetMouseButtonUp(0))
         {
-            // Check if the ray hit a mesh
-            MeshRenderer meshRenderer = hit.collider.GetComponent<MeshRenderer>();
-            if (meshRenderer != null)
+            isMouseDown = false;
+            maxRadius = 0f; 
+        }
+
+        if (isMouseDown)
+        {
+            maxRadius = Mathf.Min(maxRadius + maxRadiusIncrement * Time.deltaTime, maxMaxRadius);
+
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit))
             {
-                // Get the current material color
-                Color originalColor = meshRenderer.material.color;
-
-                // Smoothly transition the color
-                float elapsedTime = 0f;
-
-                while (elapsedTime < transitionDuration)
+                if (hit.collider.GetComponent<Collider>() != null)
                 {
-                    float t = elapsedTime / transitionDuration;
-                    meshRenderer.material.color = Color.Lerp(originalColor, injectionColor, t);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
+                    Vector3 worldPosition = hit.point;
 
-                // Ensure final color is set
-                meshRenderer.material.color = injectionColor;
+                    Collider[] colliders = Physics.OverlapSphere(worldPosition, maxRadius);
+                    foreach (Collider collider in colliders)
+                    {
+                        MeshRenderer meshRenderer = collider.GetComponent<MeshRenderer>();
+                        if (meshRenderer != null)
+                        {
+                            meshRenderer.material.color = targetColor;
+                        }
+                    }
+                }
             }
         }
-
-        isInjectingColor = false;
     }
 }

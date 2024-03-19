@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scene/MainMenu.unity
+    guid: 18ebb2d4ff9c8a84cb13526ad827c398
+  - enabled: 1
     path: Assets/IceCreanInc/Scenes/IceCreamInc.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/JellyDye/Scene/JellyDye.unity
+    guid: 2b5bc81909e581e4b926af46cef3b012
   m_configObjects: {}
